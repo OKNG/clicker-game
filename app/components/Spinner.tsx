@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 // Type for spinner
 type Spinner = {
   id: number;

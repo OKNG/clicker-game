@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Upgrade } from '../components/UpgradesPanel';
 
 /**
  * Hook for managing upgrade prices and generating upgrade data

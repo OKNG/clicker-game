@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 // Type for autoClicker
 type AutoClicker = {
   id: number;
