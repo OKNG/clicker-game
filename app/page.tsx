@@ -113,7 +113,7 @@ export default function Page() {
       <UpgradesPanel 
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        upgrades={upgrades}
+        upgrades={upgrades as Upgrade[]}
         onPurchase={handlePurchase}
         canAfford={(price) => count >= price}
         lastPurchasedId={lastPurchasedId}
