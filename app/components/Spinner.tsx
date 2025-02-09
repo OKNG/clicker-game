@@ -6,13 +6,12 @@ type Spinner = {
 
 type SpinnerProps = {
   spinners: Spinner[];
-  onSpinnerTrigger: (spinnerId: number) => void;
 };
 
 /**
  * Displays and manages spinner upgrades that generate 1% of current points every second
  */
-export function SpinnerDisplay({ spinners, onSpinnerTrigger }: SpinnerProps) {
+export function SpinnerDisplay({ spinners }: SpinnerProps) {
   return (
     <div className="flex gap-2 justify-center flex-wrap w-32">
       {spinners.map(spinner => (

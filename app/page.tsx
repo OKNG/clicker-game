@@ -31,12 +31,12 @@ export default function Page() {
     createFloatingNumber(amount);
   }, [createFloatingNumber]);
 
-  const { autoClickers, triggerAutoClick, addAutoClicker } = useAutoClickers(
+  const { autoClickers, addAutoClicker } = useAutoClickers(
     clickMultiplier,
     handlePointsEarned
   );
 
-  const { spinners, triggerSpinner, addSpinner } = useSpinners(
+  const { spinners, addSpinner } = useSpinners(
     count,
     handlePointsEarned
   );
@@ -123,14 +123,12 @@ export default function Page() {
       <div className="flex items-center gap-8">
         <SpinnerDisplay 
           spinners={spinners}
-          onSpinnerTrigger={triggerSpinner}
         />
 
         <ClickableCircle onClick={handleClick} />
 
         <AutoClickerDisplay 
           autoClickers={autoClickers}
-          onAutoClickerTrigger={triggerAutoClick}
         />
       </div>
     </div>
