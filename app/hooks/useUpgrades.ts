@@ -7,6 +7,7 @@ import { useState, useCallback, useEffect } from 'react';
 export function useUpgrades(clickMultiplier: number) {
   const [upgradePrices, setUpgradePrices] = useState<{ [key: number]: number }>({});
   const [lastPurchasedId, setLastPurchasedId] = useState<number | null>(null);
+  const [highestPurchasedId, setHighestPurchasedId] = useState<number>(-1);
 
   // Generate Fibonacci prices starting at 25
   const generateFibPrices = (count: number): number[] => {
@@ -35,44 +36,49 @@ export function useUpgrades(clickMultiplier: number) {
   }, []);
 
   // Generate upgrades data with current prices
-  const upgrades = Array(20).fill(null).map((_, i) => {
-    const currentPrice = upgradePrices[i] || generateFibPrices(20)[i];
-    
-    if (i === 0) {
+  const upgrades = Array(20).fill(null)
+    .map((_, i) => {
+      // Only generate upgrades up to the next available one
+      if (i > highestPurchasedId + 1) return null;
+
+      const currentPrice = upgradePrices[i] || generateFibPrices(20)[i];
+      
+      if (i === 0) {
+        return {
+          id: i,
+          name: "Add +1 to click",
+          price: currentPrice,
+          type: 'clickMultiplier' as const,
+          description: `Each click will give you +${clickMultiplier + 1} points`
+        };
+      }
+      if (i === 1) {
+        return {
+          id: i,
+          name: "Autoclicker",
+          price: currentPrice,
+          type: 'autoClicker' as const,
+          description: `Automatically clicks once every second with current multiplier (${clickMultiplier})`
+        };
+      }
+      if (i === 2) {
+        return {
+          id: i,
+          name: "Spinner",
+          price: currentPrice,
+          type: 'spinner' as const,
+          description: `Generates 1% of your current points every second`
+        };
+      }
       return {
         id: i,
-        name: "Add +1 to click",
+        name: `Upgrade ABC${i + 1}`,
         price: currentPrice,
-        type: 'clickMultiplier' as const,
-        description: `Each click will give you +${clickMultiplier + 1} points`
+        type: 'other' as const,
+        description: 'Coming soon...'
       };
-    }
-    if (i === 1) {
-      return {
-        id: i,
-        name: "Autoclicker",
-        price: currentPrice,
-        type: 'autoClicker' as const,
-        description: `Automatically clicks once every second with current multiplier (${clickMultiplier})`
-      };
-    }
-    if (i === 2) {
-      return {
-        id: i,
-        name: "Spinner",
-        price: currentPrice,
-        type: 'spinner' as const,
-        description: `Generates 1% of your current points every second`
-      };
-    }
-    return {
-      id: i,
-      name: `Upgrade ABC${i + 1}`,
-      price: currentPrice,
-      type: 'other' as const,
-      description: 'Coming soon...'
-    };
-  });
+    })
+    .filter(Boolean); // Remove null entries
 
   const handleUpgradePurchase = useCallback((upgradeId: number) => {
     setUpgradePrices(prev => ({
@@ -80,6 +86,7 @@ export function useUpgrades(clickMultiplier: number) {
       [upgradeId]: prev[upgradeId] * 2
     }));
     setLastPurchasedId(upgradeId);
+    setHighestPurchasedId(prev => Math.max(prev, upgradeId));
 
     // Reset the flash effect after animation completes
     setTimeout(() => {
@@ -90,6 +97,7 @@ export function useUpgrades(clickMultiplier: number) {
   return {
     upgrades,
     lastPurchasedId,
+    highestPurchasedId,
     handleUpgradePurchase
   };
 } 
