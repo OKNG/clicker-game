@@ -1,9 +1,8 @@
 ---
-description:
-globs:
+description: project organization
+globs: 
 ---
 
 # Your rule content
+If too much is being added to page.tsx, please seperate things into seperate files in a components folder for organizational clarity
 
-- You can @ files here
-- You can use markdown but dont have to

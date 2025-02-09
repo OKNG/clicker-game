@@ -23,6 +23,17 @@ export default {
             opacity: '0'
           },
         },
+        'poke': {
+          '0%': { 
+            transform: 'translateY(0)'
+          },
+          '50%': {
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            transform: 'translateY(0)'
+          }
+        },
         'slide-in': {
           '0%': {
             transform: 'translateX(100%)'
@@ -42,6 +53,7 @@ export default {
       },
       animation: {
         'float-up': 'float-up 1s ease-out forwards',
+        'poke': 'poke 0.2s ease-in-out',
         'slide-in': 'slide-in 0.3s ease-out forwards',
         'slide-out': 'slide-out 0.3s ease-out forwards'
       },
