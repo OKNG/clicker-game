@@ -28,12 +28,10 @@ type Upgrade = {
 export default function Page() {
   const [count, setCount] = useState<number>(0);
   const [floatingNumbers, setFloatingNumbers] = useState<FloatingNumber[]>([]);
-  const [nextId, setNextId] = useState(0);
   const [isUpgradesPanelOpen, setIsUpgradesPanelOpen] = useState(false);
   const [clickMultiplier, setClickMultiplier] = useState<number>(1);
   const [autoClickers, setAutoClickers] = useState<AutoClicker[]>([]);
   const [debugAmount, setDebugAmount] = useState<string>('');
-  const [floatingNumberId, setFloatingNumberId] = useState(0);
 
   const createFloatingNumber = useCallback((value: number, isNegative = false) => {
     // Generate a unique ID using timestamp and random number
@@ -146,8 +144,8 @@ export default function Page() {
     };
   });
 
-  // Helper function to determine if an upgrade is affordable
-  const canAfford = (price: number) => count >= price;
+  // Helper function to determine if an upgrade is affordable - wrap in useCallback
+  const canAfford = useCallback((price: number) => count >= price, [count]);
 
   // Handle upgrade purchase
   const handlePurchase = useCallback((upgrade: Upgrade) => {
