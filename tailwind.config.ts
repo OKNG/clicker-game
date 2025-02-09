@@ -34,6 +34,14 @@ export default {
             transform: 'translateY(0)'
           }
         },
+        'flash': {
+          '0%, 100%': {
+            backgroundColor: 'var(--tw-bg-opacity)',
+          },
+          '50%': {
+            backgroundColor: 'rgb(34 197 94 / var(--tw-bg-opacity))',
+          }
+        },
         'slide-in': {
           '0%': {
             transform: 'translateX(100%)'
@@ -54,6 +62,7 @@ export default {
       animation: {
         'float-up': 'float-up 1s ease-out forwards',
         'poke': 'poke 0.2s ease-in-out',
+        'flash': 'flash 0.1s ease-in-out',
         'slide-in': 'slide-in 0.3s ease-out forwards',
         'slide-out': 'slide-out 0.3s ease-out forwards'
       },

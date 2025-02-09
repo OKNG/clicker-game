@@ -32,6 +32,38 @@ export default function Page() {
   const [clickMultiplier, setClickMultiplier] = useState<number>(1);
   const [autoClickers, setAutoClickers] = useState<AutoClicker[]>([]);
   const [debugAmount, setDebugAmount] = useState<string>('');
+  const [lastPurchasedId, setLastPurchasedId] = useState<number | null>(null);
+  const [upgradePrices, setUpgradePrices] = useState<{ [key: number]: number }>({});
+  
+  // Touch gesture handling
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && !isUpgradesPanelOpen) {
+      setIsUpgradesPanelOpen(true);
+    } else if (isRightSwipe && isUpgradesPanelOpen) {
+      setIsUpgradesPanelOpen(false);
+    }
+  };
 
   const createFloatingNumber = useCallback((value: number, isNegative = false) => {
     // Generate a unique ID using timestamp and random number
@@ -92,7 +124,7 @@ export default function Page() {
       autoClickers.forEach(clicker => {
         triggerAutoClick(clicker.id);
       });
-    }, 5000);
+    }, 1000);
 
     // Clean up interval on unmount or when autoClickers changes
     return () => clearInterval(intervalId);
@@ -114,14 +146,25 @@ export default function Page() {
     return prices;
   };
 
-  // Placeholder upgrades data with Fibonacci prices
-  const fibPrices = generateFibPrices(20);
+  // Initialize upgrade prices on first render
+  useEffect(() => {
+    const fibPrices = generateFibPrices(20);
+    const initialPrices = fibPrices.reduce((acc, price, index) => {
+      acc[index] = price;
+      return acc;
+    }, {} as { [key: number]: number });
+    setUpgradePrices(initialPrices);
+  }, []);
+
+  // Placeholder upgrades data with current prices
   const upgrades = Array(20).fill(null).map((_, i) => {
+    const currentPrice = upgradePrices[i] || generateFibPrices(20)[i]; // Fallback to base price if not set
+    
     if (i === 0) {
       return {
         id: i,
         name: "Add +1 to click",
-        price: fibPrices[i],
+        price: currentPrice,
         type: 'clickMultiplier' as const,
         description: `Each click will give you +${clickMultiplier + 1} points`
       };
@@ -130,15 +173,15 @@ export default function Page() {
       return {
         id: i,
         name: "Add autoclicker",
-        price: fibPrices[i],
+        price: currentPrice,
         type: 'autoClicker' as const,
-        description: `Automatically clicks once every 5 seconds with current multiplier (${clickMultiplier})`
+        description: `Automatically clicks once every second with current multiplier (${clickMultiplier})`
       };
     }
     return {
       id: i,
       name: `Upgrade ABC${i + 1}`,
-      price: fibPrices[i],
+      price: currentPrice,
       type: 'other' as const,
       description: 'Coming soon...'
     };
@@ -152,6 +195,18 @@ export default function Page() {
     if (canAfford(upgrade.price)) {
       setCount(prev => prev - upgrade.price);
       createFloatingNumber(upgrade.price, true);
+      setLastPurchasedId(upgrade.id);
+
+      // Double the price of the purchased upgrade
+      setUpgradePrices(prev => ({
+        ...prev,
+        [upgrade.id]: prev[upgrade.id] * 2
+      }));
+
+      // Reset the flash effect after animation completes
+      setTimeout(() => {
+        setLastPurchasedId(null);
+      }, 100);
 
       // Handle different upgrade types
       if (upgrade.type === 'clickMultiplier') {
@@ -176,7 +231,12 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center overflow-hidden relative">
+    <div 
+      className="min-h-screen bg-gray-900 flex flex-col items-center justify-center overflow-hidden relative"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Debug Input Panel */}
       <div className="fixed top-4 left-4 z-50 bg-gray-800 p-4 rounded-lg shadow-lg flex gap-2">
         <input
@@ -213,31 +273,45 @@ export default function Page() {
         </div>
       ))}
 
-      {/* Hamburger Menu Button */}
-      <button
-        onClick={() => setIsUpgradesPanelOpen(!isUpgradesPanelOpen)}
-        className="fixed top-4 right-4 z-50 text-white p-2 hover:bg-gray-700 rounded-lg transition-colors"
-      >
-        <div className="w-6 h-0.5 bg-current mb-1"></div>
-        <div className="w-6 h-0.5 bg-current mb-1"></div>
-        <div className="w-6 h-0.5 bg-current"></div>
-      </button>
+      {/* Hamburger Menu Button - only show when panel is closed */}
+      {!isUpgradesPanelOpen && (
+        <button
+          onClick={() => setIsUpgradesPanelOpen(true)}
+          className="fixed top-4 right-4 z-50 text-white p-2 hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <div className="w-6 h-0.5 bg-current mb-1"></div>
+          <div className="w-6 h-0.5 bg-current mb-1"></div>
+          <div className="w-6 h-0.5 bg-current"></div>
+        </button>
+      )}
 
       {/* Upgrades Panel */}
       <div 
-        className={`fixed top-0 right-0 h-full w-80 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-out overflow-hidden
+        className={`fixed top-0 right-0 h-full w-80 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-out overflow-hidden z-50
                     ${isUpgradesPanelOpen ? 'translate-x-0' : 'translate-x-full'}
                     md:w-96`}
       >
         <div className="p-6 h-full">
-          <h2 className="text-2xl font-bold text-white mb-6">Upgrades</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-white">Upgrades</h2>
+            {/* Hamburger Menu Button - inside panel */}
+            <button
+              onClick={() => setIsUpgradesPanelOpen(false)}
+              className="text-white p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <div className="w-6 h-0.5 bg-current mb-1"></div>
+              <div className="w-6 h-0.5 bg-current mb-1"></div>
+              <div className="w-6 h-0.5 bg-current"></div>
+            </button>
+          </div>
           <div className="space-y-4 h-[calc(100%-4rem)] overflow-y-auto pr-2">
             {upgrades.map(upgrade => (
               <div
                 key={upgrade.id}
                 onClick={() => handlePurchase(upgrade)}
                 className={`bg-gray-700 rounded-lg p-4 flex flex-col hover:bg-gray-600 transition-colors
-                           ${canAfford(upgrade.price) ? 'hover:bg-gray-600 cursor-pointer' : 'opacity-90 cursor-not-allowed'}`}
+                           ${canAfford(upgrade.price) ? 'hover:bg-gray-600 cursor-pointer' : 'opacity-90 cursor-not-allowed'}
+                           ${lastPurchasedId === upgrade.id ? 'animate-flash' : ''}`}
               >
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-white font-medium">{upgrade.name}</span>
