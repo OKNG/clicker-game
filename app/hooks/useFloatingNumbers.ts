@@ -11,19 +11,24 @@ export function useFloatingNumbers() {
     // Generate a unique ID using timestamp and random number
     const uniqueId = Date.now() + Math.random();
     
+    // Generate a random speed modifier between 0.5 and 2.5
+    const speedModifier = 0.5 + Math.random() * 2;
+    
     const newFloatingNumber: FloatingNumber = {
       id: uniqueId,
       value: Math.abs(value),
       left: Math.random() * 80 + 10,
-      isNegative
+      isNegative,
+      speedModifier
     };
     
     setFloatingNumbers(prev => [...prev, newFloatingNumber]);
 
     // Remove the floating number after animation completes
+    // Adjust timeout to account for speed modifier
     setTimeout(() => {
       setFloatingNumbers(prev => prev.filter(num => num.id !== uniqueId));
-    }, 1000);
+    }, 1000 / speedModifier);
   }, []);
 
   return {

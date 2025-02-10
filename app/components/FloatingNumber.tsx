@@ -4,6 +4,7 @@ type FloatingNumber = {
   value: number;
   left: number;
   isNegative?: boolean;
+  speedModifier: number;
 };
 
 type FloatingNumbersProps = {
@@ -19,10 +20,11 @@ export function FloatingNumbersDisplay({ floatingNumbers }: FloatingNumbersProps
       {floatingNumbers.map(num => (
         <div
           key={num.id}
-          className={`absolute bottom-0 font-bold text-2xl animate-float-up pointer-events-none
+          className={`absolute bottom-0 font-bold text-2xl pointer-events-none
                      ${num.isNegative ? 'text-red-400' : 'text-green-400'}`}
           style={{ 
             left: `${num.left}%`,
+            animation: `float-up ${1 / num.speedModifier}s ease-out forwards`
           }}
         >
           {num.isNegative ? '-' : '+'}${num.value.toLocaleString()}

@@ -80,7 +80,7 @@ export default function Page() {
 
   return (
     <div 
-      className="min-h-screen bg-gray-900 flex flex-col items-center justify-center overflow-hidden relative"
+      className="min-h-screen h-screen bg-gray-900 flex flex-col items-center overflow-hidden relative"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -91,10 +91,30 @@ export default function Page() {
         onDebugAdd={handleDebugAdd}
       />
 
-      {/* Counter display */}
-      <div className="text-6xl font-bold text-white mb-16">
-        {count.toLocaleString()}
+      <div className="flex-1" /> {/* Spacer */}
+
+      {/* Game content centered vertically */}
+      <div className="flex flex-col items-center gap-8 mb-12">
+        {/* Counter display */}
+        <div className="text-4xl md:text-6xl font-bold text-white">
+          {count.toLocaleString()}
+        </div>
+
+        {/* Clickable circle with spinners and autoclickers */}
+        <div className="flex items-center justify-center gap-4 md:gap-8">
+          <SpinnerDisplay 
+            spinners={spinners}
+          />
+
+          <ClickableCircle onClick={handleClick} />
+
+          <AutoClickerDisplay 
+            autoClickers={autoClickers}
+          />
+        </div>
       </div>
+
+      <div className="flex-1" /> {/* Spacer */}
 
       <FloatingNumbersDisplay floatingNumbers={floatingNumbers} />
 
@@ -118,19 +138,6 @@ export default function Page() {
         canAfford={(price) => count >= price}
         lastPurchasedId={lastPurchasedId}
       />
-
-      {/* Clickable circle with spinners and autoclickers */}
-      <div className="flex items-center gap-8">
-        <SpinnerDisplay 
-          spinners={spinners}
-        />
-
-        <ClickableCircle onClick={handleClick} />
-
-        <AutoClickerDisplay 
-          autoClickers={autoClickers}
-        />
-      </div>
     </div>
   );
 }
