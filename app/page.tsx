@@ -7,11 +7,13 @@ import { FloatingNumbersDisplay } from './components/FloatingNumber';
 import { UpgradesPanel, type Upgrade } from './components/UpgradesPanel';
 import { ClickableCircle } from './components/ClickableCircle';
 import { DebugPanel } from './components/DebugPanel';
+import { PulserDisplay } from './components/Pulser';
 
 import { useFloatingNumbers } from './hooks/useFloatingNumbers';
 import { useUpgrades } from './hooks/useUpgrades';
 import { useAutoClickers } from './hooks/useAutoClickers';
 import { useSpinners } from './hooks/useSpinners';
+import { usePulsers } from './hooks/usePulsers';
 import { useTouchGestures } from './hooks/useTouchGestures';
 import { useResponsiveMenu } from './hooks/useResponsiveMenu';
 
@@ -31,6 +33,11 @@ export default function Page() {
     createFloatingNumber(amount);
   }, [createFloatingNumber]);
 
+  // Handler for pulser trigger
+  const handlePulserTrigger = useCallback(() => {
+    setClickMultiplier(prev => prev + 1);
+  }, []);
+
   const { autoClickers, addAutoClicker } = useAutoClickers(
     clickMultiplier,
     handlePointsEarned
@@ -40,6 +47,8 @@ export default function Page() {
     count,
     handlePointsEarned
   );
+
+  const { pulsers, addPulser } = usePulsers(handlePulserTrigger);
 
   const { onTouchStart, onTouchMove, onTouchEnd } = useTouchGestures(
     () => !isMenuOpen && setIsMenuOpen(true),
@@ -65,9 +74,11 @@ export default function Page() {
         addAutoClicker();
       } else if (upgrade.type === 'spinner') {
         addSpinner();
+      } else if (upgrade.type === 'pulser') {
+        addPulser();
       }
     }
-  }, [count, createFloatingNumber, handleUpgradePurchase, addAutoClicker, addSpinner]);
+  }, [count, createFloatingNumber, handleUpgradePurchase, addAutoClicker, addSpinner, addPulser]);
 
   // Handle debug amount addition
   const handleDebugAdd = useCallback(() => {
@@ -112,6 +123,9 @@ export default function Page() {
             autoClickers={autoClickers}
           />
         </div>
+
+        {/* Pulsers below the circle */}
+        <PulserDisplay pulsers={pulsers} />
       </div>
 
       <div className="flex-1" /> {/* Spacer */}

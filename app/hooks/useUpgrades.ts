@@ -70,6 +70,15 @@ export function useUpgrades(clickMultiplier: number) {
           description: `Generates 1% of your current points every second`
         };
       }
+      if (i === 3) {
+        return {
+          id: i,
+          name: "Pulser",
+          price: currentPrice,
+          type: 'pulser' as const,
+          description: `Adds +1 to your click multiplier every 5 seconds`
+        };
+      }
       return {
         id: i,
         name: `Upgrade ABC${i + 1}`,

@@ -3,7 +3,7 @@ type Upgrade = {
   id: number;
   name: string;
   price: number;
-  type: 'clickMultiplier' | 'autoClicker' | 'spinner' | 'other';
+  type: 'clickMultiplier' | 'autoClicker' | 'spinner' | 'pulser' | 'other';
   description: string;
 };
 
