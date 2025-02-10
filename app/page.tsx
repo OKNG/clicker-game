@@ -130,7 +130,10 @@ export default function Page() {
 
       <div className="flex-1" /> {/* Spacer */}
 
-      <FloatingNumbersDisplay floatingNumbers={floatingNumbers} />
+      {/* Floating numbers container - positioned at bottom of viewport */}
+      <div className="fixed bottom-16 left-0 w-full pointer-events-none z-10">
+        <FloatingNumbersDisplay floatingNumbers={floatingNumbers} />
+      </div>
 
       {/* Hamburger Menu Button - only show when panel is closed */}
       {!isMenuOpen && (
